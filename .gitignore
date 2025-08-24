@@ -1,0 +1,11 @@
+# build artifacts
+*.o
+*.obj
+*.exe
+*.out
+*.log
+
+# os/editor junk
+.DS_Store
+Thumbs.db
+.swp

@@ -1,0 +1,3 @@
+D:/Project_Python_based/File_Compressor/build/CMakeFiles/compress.dir
+D:/Project_Python_based/File_Compressor/build/CMakeFiles/edit_cache.dir
+D:/Project_Python_based/File_Compressor/build/CMakeFiles/rebuild_cache.dir
