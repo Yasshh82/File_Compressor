@@ -1,13 +1,32 @@
 #include <iostream>
 #include <string>
+#include "Huffman.hpp"
 
 int main(int argc, char** argv){
-    if(argc < 2){
-        std::cout << "Compression Tool (bootstrap)\n"
-                  << "Usage (coming next): ./compress -algo [huffman|lzw] -mode [compress|decompress] <input> <output>\n";
+    if(argc < 7){
+        std::cout<< "Usage: ./compress -algo [huffman|lzw] -mode [compress|decompress] <input> <output>\n";
         return 0;
     }
 
-    std::cout << "Args received. Full functionality lands in step 2.\n";
+    std::string algo = argv[2];
+    std::string mode = argv[4];
+    std::string inputFile = argv[5];
+    std::string outputFile = argv[6];
+
+    if(algo == "huffman"){
+        Huffman h;
+        if(mode == "compress"){
+            h.compress(inputFile, outputFile);
+        } 
+        else if(mode == "decompress"){
+            h.decompress(inputFile, outputFile);
+        } 
+        else {
+            std::cerr<<"Invalid mode.\n";
+        }
+    }
+    else{
+        std::cerr<<"Unsupported algorithm (LZW coming later).\n";
+    }
     return 0;
 }

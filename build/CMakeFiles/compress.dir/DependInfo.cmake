@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "D:/Project_Python_based/File_Compressor/src/Huffman.cpp" "CMakeFiles/compress.dir/src/Huffman.cpp.obj" "gcc" "CMakeFiles/compress.dir/src/Huffman.cpp.obj.d"
   "D:/Project_Python_based/File_Compressor/src/main.cpp" "CMakeFiles/compress.dir/src/main.cpp.obj" "gcc" "CMakeFiles/compress.dir/src/main.cpp.obj.d"
   )
 

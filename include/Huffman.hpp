@@ -3,39 +3,34 @@
 #include <unordered_map>
 #include <vector>
 #include <queue>
-
-struct HuffmanNode {
-    char ch;
-    int freq;
-    HuffmanNode* left;
-    HuffmanNode* right;
-
-    HuffmanNode(char c, int f) : ch(c), freq(f), left(nullptr), right(nullptr) {}
-};
-
-struct CompareNode {
-    bool operator()(HuffmanNode* a, HuffmanNode* b) {
-        return a->freq > b->freq; // Min-heap based on frequency
-    }
-};
+#include <memory>
 
 class Huffman {
 public:
-    Huffman() = default;
-    ~Huffman();
-
     void compress(const std::string& inputFile, const std::string& outputFile);
     void decompress(const std::string& inputFile, const std::string& outputFile);
 
 private:
-    HuffmanNode* root = nullptr;
+    struct Node {
+        char ch;
+        int freq;
+        std::shared_ptr<Node> left;
+        std::shared_ptr<Node> right;
 
-    void buildTree(const std::unordered_map<char, int>& freq);
-    void freeTree(HuffmanNode* node);
+        Node(char c, int f) : ch(c), freq(f), left(nullptr), right(nullptr) {}
+        Node(std::shared_ptr<Node> l, std::shared_ptr<Node> r) : ch('\0'), freq(l->freq + r->freq), left(l), right(r) {}
+    };
+    struct Compare {
+        bool operator()(const std::shared_ptr<Node>& a, const std::shared_ptr<Node>& b) {
+            return a->freq > b->freq;
+        }
+    };
 
-    void generateCodes(HuffmanNode* node, const std::string& prefix, 
-                       std::unordered_map<char, std::string>& codeTable);
+    std::unordered_map<char, int> buildFrequencyTable(const std::string& inputFile);
+    std::shared_ptr<Node> buildTree(const std::unordered_map<char, int>& freqMap);
+    void buildEncodingTable(std::shared_ptr<Node> root, const std::string& str);
 
-    std::string readFile(const std::string& filename);
-    void writeFile(const std::string& filename, const std::string& data);
+    std::unordered_map<char, std::string> encodingTable;
+
+    void writeBitstream(const std::string& bits, const std::string& outputFile, const std::unordered_map<char, int>& freqMap);
 };

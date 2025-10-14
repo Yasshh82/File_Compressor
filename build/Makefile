@@ -128,6 +128,30 @@ compress/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\compress.dir\build.make CMakeFiles/compress.dir/build
 .PHONY : compress/fast
 
+src/Huffman.obj: src/Huffman.cpp.obj
+.PHONY : src/Huffman.obj
+
+# target to build an object file
+src/Huffman.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\compress.dir\build.make CMakeFiles/compress.dir/src/Huffman.cpp.obj
+.PHONY : src/Huffman.cpp.obj
+
+src/Huffman.i: src/Huffman.cpp.i
+.PHONY : src/Huffman.i
+
+# target to preprocess a source file
+src/Huffman.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\compress.dir\build.make CMakeFiles/compress.dir/src/Huffman.cpp.i
+.PHONY : src/Huffman.cpp.i
+
+src/Huffman.s: src/Huffman.cpp.s
+.PHONY : src/Huffman.s
+
+# target to generate assembly for a file
+src/Huffman.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\compress.dir\build.make CMakeFiles/compress.dir/src/Huffman.cpp.s
+.PHONY : src/Huffman.cpp.s
+
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
@@ -161,6 +185,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... compress
+	@echo ... src/Huffman.obj
+	@echo ... src/Huffman.i
+	@echo ... src/Huffman.s
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
