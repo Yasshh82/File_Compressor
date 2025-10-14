@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/compress.dir/src/Huffman.cpp.obj"
   "CMakeFiles/compress.dir/src/Huffman.cpp.obj.d"
+  "CMakeFiles/compress.dir/src/LZW.cpp.obj"
+  "CMakeFiles/compress.dir/src/LZW.cpp.obj.d"
   "CMakeFiles/compress.dir/src/main.cpp.obj"
   "CMakeFiles/compress.dir/src/main.cpp.obj.d"
   "compress.exe"

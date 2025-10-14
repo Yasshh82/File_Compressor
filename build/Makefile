@@ -152,6 +152,30 @@ src/Huffman.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\compress.dir\build.make CMakeFiles/compress.dir/src/Huffman.cpp.s
 .PHONY : src/Huffman.cpp.s
 
+src/LZW.obj: src/LZW.cpp.obj
+.PHONY : src/LZW.obj
+
+# target to build an object file
+src/LZW.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\compress.dir\build.make CMakeFiles/compress.dir/src/LZW.cpp.obj
+.PHONY : src/LZW.cpp.obj
+
+src/LZW.i: src/LZW.cpp.i
+.PHONY : src/LZW.i
+
+# target to preprocess a source file
+src/LZW.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\compress.dir\build.make CMakeFiles/compress.dir/src/LZW.cpp.i
+.PHONY : src/LZW.cpp.i
+
+src/LZW.s: src/LZW.cpp.s
+.PHONY : src/LZW.s
+
+# target to generate assembly for a file
+src/LZW.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\compress.dir\build.make CMakeFiles/compress.dir/src/LZW.cpp.s
+.PHONY : src/LZW.cpp.s
+
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
@@ -188,6 +212,9 @@ help:
 	@echo ... src/Huffman.obj
 	@echo ... src/Huffman.i
 	@echo ... src/Huffman.s
+	@echo ... src/LZW.obj
+	@echo ... src/LZW.i
+	@echo ... src/LZW.s
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
