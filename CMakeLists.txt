@@ -9,4 +9,5 @@ include_directories(include)
 add_executable(compress
     src/main.cpp
     src/Huffman.cpp
+    src/LZW.cpp
 )

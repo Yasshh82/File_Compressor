@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Huffman.hpp"
+#include "LZW.hpp"
 
 int main(int argc, char** argv){
     if(argc < 7){
@@ -25,8 +26,17 @@ int main(int argc, char** argv){
             std::cerr<<"Invalid mode.\n";
         }
     }
-    else{
-        std::cerr<<"Unsupported algorithm (LZW coming later).\n";
-    }
+    else if(algo == "lzw"){
+        LZW l;
+        if(mode == "compress"){
+            l.compress(inputFile, outputFile);
+        } 
+        else if(mode == "decompress"){
+            l.decompress(inputFile, outputFile);
+        } 
+        else {
+            std::cerr<<"Invalid mode.\n";
+        }
+    } 
     return 0;
 }
