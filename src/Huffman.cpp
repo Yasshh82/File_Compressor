@@ -2,6 +2,8 @@
 #include <fstream>
 #include <iostream>
 #include <bitset>
+#include <chrono>
+#include <filesystem>
 
 void Huffman::writeBitstream(const std::string& bits, const std::string& outputFile, const std::unordered_map<char, int>& freqMap) {
     std::ofstream out(outputFile, std::ios::binary);
@@ -82,6 +84,8 @@ void Huffman::buildEncodingTable(std::shared_ptr<Node> root, const std::string& 
 }
 
 void Huffman::compress(const std::string& inputFile, const std::string& outputFile) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     auto freqMap = buildFrequencyTable(inputFile);
     std::cout << "DEBUG: Frequency map size = " << freqMap.size() << std::endl;
 
@@ -100,10 +104,20 @@ void Huffman::compress(const std::string& inputFile, const std::string& outputFi
     std::cout << "DEBUG: Attempting to write " << outputFile << std::endl;
 
     writeBitstream(bits, outputFile, freqMap);
-    std::cout << "[Huffman] Compressed " << inputFile << " -> " << outputFile << " (" << bits.size() / 8.0 << " bytes approx)\n";
+
+    auto end = std::chrono::high_resolution_clock::now();
+    double timeTaken = std::chrono::duration<double>(end - start).count();
+    auto inSize = std::filesystem::file_size(inputFile);
+    auto outSize = std::filesystem::file_size(outputFile);
+    double ratio = (1.0 - (double)outSize / inSize) * 100.0;
+    std::cout << "✅ [Huffman] Compression complete.\n";
+    std::cout << "Input: " << inSize << " bytes | Output: " << outSize << " bytes | ";
+    std::cout << "Ratio: " << ratio << "% | Time: " << timeTaken << "s\n"; 
 }
 
 void Huffman::decompress(const std::string& inputFile, const std::string& outputFile) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     std::ifstream in(inputFile, std::ios::binary);
     if(!in.is_open()){
         throw std::runtime_error("Could not open input file: " + inputFile);
@@ -150,4 +164,13 @@ void Huffman::decompress(const std::string& inputFile, const std::string& output
         }
     }
     out.close();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    double timeTaken = std::chrono::duration<double>(end - start).count();
+
+    auto inSize = std::filesystem::file_size(inputFile);
+    auto outSize = std::filesystem::file_size(outputFile);
+    std::cout << "✅ [Huffman] Decompression complete.\n";
+    std::cout << "Input: " << inSize << " bytes | Output: " << outSize << " bytes | ";
+    std::cout << "Time: " << timeTaken << "s\n";
 }

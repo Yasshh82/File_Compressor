@@ -1,16 +1,18 @@
 #include <LZW.hpp>
 #include <fstream>
 #include <iostream>
+#include <chrono>
+#include <filesystem>
 
 void LZW::compress(const std::string& inputFile, const std::string& outputFile){
+    auto start = std::chrono::high_resolution_clock::now();
+
     std::ifstream in(inputFile, std::ios::binary);
     std::ofstream out(outputFile, std::ios::binary);
     if(!in.is_open() || !out.is_open()){
         std::cerr<<"Error opening files.\n";
         return;
     }
-
-
 
     // Initialize dictionary with all single character
     std::unordered_map<std::string, int> dict;
@@ -38,9 +40,22 @@ void LZW::compress(const std::string& inputFile, const std::string& outputFile){
 
     in.close();
     out.close();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    double timeTaken = std::chrono::duration<double>(end - start).count();
+
+    auto inSize = std::filesystem::file_size(inputFile);
+    auto outSize = std::filesystem::file_size(outputFile);
+    double ratio = (1.0 - (double)outSize / inSize) * 100.0;
+
+    std::cout << "✅ [LZW] Compression complete.\n";
+    std::cout << "Input: " << inSize << " bytes | Output: " << outSize << " bytes | ";
+    std::cout << "Ratio: " << ratio << "% | Time: " << timeTaken << "s\n";
 }
 
 void LZW::decompress(const std::string& inputFile, const std::string& outputFile){
+    auto start = std::chrono::high_resolution_clock::now();
+
     std::ifstream in(inputFile, std::ios::binary);
     std::ofstream out(outputFile, std::ios::binary);
     if(!in.is_open() || !out.is_open()){
@@ -77,4 +92,14 @@ void LZW::decompress(const std::string& inputFile, const std::string& outputFile
 
     in.close();
     out.close();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    double timeTaken = std::chrono::duration<double>(end - start).count();
+
+    auto inSize = std::filesystem::file_size(inputFile);
+    auto outSize = std::filesystem::file_size(outputFile);
+
+    std::cout << "✅ [LZW] Decompression complete.\n";
+    std::cout << "Input: " << inSize << " bytes | Output: " << outSize << " bytes | ";
+    std::cout << "Time: " << timeTaken << "s\n";
 }
