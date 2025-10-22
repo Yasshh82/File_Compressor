@@ -204,4 +204,10 @@ CMakeFiles/compress.dir/src/Huffman.cpp.obj: \
  D:/mingw64/include/c++/13.2.0/bits/sstream.tcc \
  D:/mingw64/include/c++/13.2.0/codecvt \
  D:/mingw64/include/c++/13.2.0/bits/fs_dir.h \
- D:/mingw64/include/c++/13.2.0/bits/fs_ops.h
+ D:/mingw64/include/c++/13.2.0/bits/fs_ops.h \
+ D:/mingw64/include/c++/13.2.0/thread \
+ D:/mingw64/include/c++/13.2.0/bits/std_thread.h \
+ D:/mingw64/include/c++/13.2.0/bits/this_thread_sleep.h \
+ D:/mingw64/include/c++/13.2.0/mutex \
+ D:/mingw64/include/c++/13.2.0/bits/std_mutex.h \
+ D:/mingw64/include/c++/13.2.0/bits/unique_lock.h

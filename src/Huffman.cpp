@@ -4,6 +4,9 @@
 #include <bitset>
 #include <chrono>
 #include <filesystem>
+#include <thread>
+#include <mutex>
+#include <vector>
 
 void Huffman::writeBitstream(const std::string& bits, const std::string& outputFile, const std::unordered_map<char, int>& freqMap) {
     std::ofstream out(outputFile, std::ios::binary);
@@ -21,6 +24,10 @@ void Huffman::writeBitstream(const std::string& bits, const std::string& outputF
         out.write(&p.first, sizeof(char));
         out.write(reinterpret_cast<const char*>(&p.second), sizeof(int));
     }
+
+    // Write bit length (important for exact decompression)
+    int bitLen = static_cast<int>(bits.size());
+    out.write(reinterpret_cast<const char*>(&bitLen), sizeof(bitLen));
 
     // --- COMPRESSED DATA ---
     unsigned char buffer = 0;
@@ -115,6 +122,82 @@ void Huffman::compress(const std::string& inputFile, const std::string& outputFi
     std::cout << "Ratio: " << ratio << "% | Time: " << timeTaken << "s\n"; 
 }
 
+void Huffman::compressMultiThreaded(const std::string& inputFile, const std::string& outputFile, int numThreads) {
+    using namespace std::chrono;
+
+    auto start = high_resolution_clock::now();
+    std::ifstream in(inputFile, std::ios::binary);
+    if(!in.is_open()){
+        throw std::runtime_error("Could not open input file: " + inputFile);
+    }
+    std::vector<std::string> chunks(numThreads);
+    std::uintmax_t fileSize = std::filesystem::file_size(inputFile);
+    std::uintmax_t chunkSize = fileSize / numThreads;
+
+    // Read file in chunks
+    for(int i = 0; i < numThreads; ++i) {
+        std::string data(chunkSize, '\0');
+        in.read(&data[0], chunkSize);
+        chunks[i] = std::move(data);
+    }
+    in.close();
+
+    std::mutex outputMutex;
+    std::vector<std::string>compressedChunks(numThreads);
+
+    auto worker =[&](int idx){
+        std::unordered_map<char, int> freq;
+        for(char c : chunks[idx]) freq[c]++;
+        auto root = buildTree(freq);
+        buildEncodingTable(root, "");
+
+        std::string bits;
+        for(char c : chunks[idx]) bits += encodingTable[c];
+
+        //Protect shared vector
+        std::lock_guard<std::mutex> lock(outputMutex);
+        compressedChunks[idx] = std::move(bits);
+    };
+
+    std::vector<std::thread> threads;
+    for(int i = 0; i < numThreads; ++i){
+        threads.emplace_back(worker, i);
+    }
+    for(auto& t : threads) t.join();
+
+    //merge compressed bitstreams
+    std::ofstream out(outputFile, std::ios::binary);
+    for(auto& chunkBits : compressedChunks){
+        unsigned char buffer = 0;
+        int bitCount = 0;
+        for(char b: chunkBits){
+            buffer <<= 1;
+            if(b == '1') buffer |= 1;
+            bitCount++;
+            if(bitCount == 8){
+                out.write(reinterpret_cast<char*>(&buffer), 1);
+                buffer = 0;
+                bitCount = 0;
+            }
+        }
+        if(bitCount > 0){
+            buffer <<= (8 - bitCount);
+            out.write(reinterpret_cast<char*>(&buffer), 1);
+        }
+    }
+    out.close();
+
+    auto end = high_resolution_clock::now();
+    double timeTaken = duration<double>(end - start).count();
+
+    auto outSize = std::filesystem::file_size(outputFile);
+    double ratio = (1.0 - (double)outSize / fileSize) * 100.0;
+
+    std::cout << "✅ [Huffman Multi-threaded] Compression complete.\n";
+    std::cout << "Threads: " << numThreads << " | Input: " << fileSize
+              << " bytes | "<< "Output: " << outSize << " bytes | Ratio: " << ratio << "% | Time: " << timeTaken << "s\n";
+}
+
 void Huffman::decompress(const std::string& inputFile, const std::string& outputFile) {
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -125,6 +208,7 @@ void Huffman::decompress(const std::string& inputFile, const std::string& output
     // --- READ HEADER ---
     int uniqueCount;
     in.read(reinterpret_cast<char*>(&uniqueCount), sizeof(uniqueCount));
+
     std::unordered_map<char, int> freqMap;
     for (int i = 0; i < uniqueCount; ++i) {
         char ch;
@@ -134,6 +218,10 @@ void Huffman::decompress(const std::string& inputFile, const std::string& output
         freqMap[ch] = freq;
     }
 
+    // Read bit length
+    int bitLen = 0;
+    in.read(reinterpret_cast<char*>(&bitLen), sizeof(bitLen));
+
     // --- REBUILD TREE ---
     std::shared_ptr<Node> root = buildTree(freqMap);
 
@@ -141,11 +229,16 @@ void Huffman::decompress(const std::string& inputFile, const std::string& output
     std::string bits;
     char byte;
     while (in.read(&byte, 1)) {
-        for(int i=7; i>=0; i--){
+        for(int i=7; i>=0; --i){
             bits += ((byte >> i) & 1) ? '1' : '0';
         }
     }
     in.close();
+
+    // Trim bits to valid length
+    if(bitLen < bits.size()){
+        bits.resize(bitLen);
+    }
 
     // --- DECODE ---
     std::ofstream out(outputFile);

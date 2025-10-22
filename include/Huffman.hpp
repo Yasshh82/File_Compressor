@@ -8,6 +8,7 @@
 class Huffman {
 public:
     void compress(const std::string& inputFile, const std::string& outputFile);
+    void compressMultiThreaded(const std::string& inputFile, const std::string& outputFile, int numThreads = 4);
     void decompress(const std::string& inputFile, const std::string& outputFile);
 
 private:
